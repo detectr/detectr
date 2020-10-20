@@ -11,7 +11,7 @@ class Parser():
         self.pattern = [
             re.compile(r"^([0-9]+)\s+([a-zA-Z0-9_]+)\(.*"),
             re.compile(r"^()([a-zA-Z0-9_]+)\(.*"),
-            re.compile(r"^\[pid ([0-9]+)\]\s+([a-zA-Z0-9_]+)\(.*")
+            re.compile(r"^\[pid\s+([0-9]+)\]\s+([a-zA-Z0-9_]+)\(.*")
         ]
 
     def parse_line(self, line):

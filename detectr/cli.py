@@ -13,7 +13,8 @@ from detectr.mlmodel import MLModel
 from detectr.mvcmodel import MVCModelLearn, MVCModelWatch
 from detectr.mvcview import MVCViewLearn, MVCViewWatch
 
-PROGNAME = "foo"
+PROGNAME = "detectr"
+GITHUB = "https://github.com/detectr"
 qq = Queue()
 
 
@@ -82,13 +83,13 @@ def subcommand_learn(args):
 	try:
 		if args.cmd is not None:
 			print("\033[32m|------ Executing " + PROGNAME + " in \033[1;32mlearning mode\033[0;32m ------|\033[0m")
-			print("\033[32m|------ https://github.com/foo         ------|\033[0m")
+			print("\033[32m|------ " + GITHUB + "         ------|\033[0m")
 			proc = Process(target=process_reader, args=(qq, args.cmd,))
 			proc.start()
 			read_loop(mvc_model, mvc_view)
 		else: # --strace is given
-			print("\033[32m|------ Reading XXX in \033[1;32mlearning mode\033[0;32m ------|\033[0m")
-			print("\033[32m|------ https://github.com/foo         ------|\033[0m")
+			print("\033[32m|------ Learning " + PROGNAME + " in \033[1;32mlearning mode\033[0;32m  ------|\033[0m")
+			print("\033[32m|------ " + GITHUB + "         ------|\033[0m")
 			proc = Process(target=file_reader, args=(qq, args.strace, args.follow, args.end))
 			proc.start()
 			read_loop(mvc_model, mvc_view)
@@ -101,9 +102,9 @@ def subcommand_learn(args):
 	print("\033[1;35m[\033[1;34m■\033[1;35m]\033[1;34m Model written to file", args.output, "\033[0m")
 
 
-def subcommand_watch(args):
-	print("\033[32m|------ Executing " + PROGNAME + " in \033[1;32mwatch mode\033[0;32m ------|\033[0m")
-	print("\033[32m|------ https://github.com/foo      ------|\033[0m")
+def subcommand_detect(args):
+	print("\033[32m|------ Executing " + PROGNAME + " in \033[1;32mdetect mode\033[0;32m -----|\033[0m")
+	print("\033[32m|------ " + GITHUB + "      ------|\033[0m")
 	model = MLModel.from_file(args.model)
 	mvc_model = MVCModelWatch(model=model)
 	mvc_view = MVCViewWatch(mvc_model)
@@ -131,22 +132,26 @@ parser_learn.add_argument('--follow', action='store_true')
 parser_learn.add_argument('--end', action='store_true')
 parser_learn.set_defaults(func=subcommand_learn)
 
-# Watching
+# Detection
 
-parser_watch = subparser.add_parser('watch', help="Watch process.")
-parser_watch.add_argument('--model', required=True, type=str, help="Filename of model.")
-group = parser_watch.add_mutually_exclusive_group(required=True)
+parser_detect = subparser.add_parser('detect', help="Detection.")
+parser_detect.add_argument('--model', required=True, type=str, help="Filename of model.")
+group = parser_detect.add_mutually_exclusive_group(required=True)
 group.add_argument('--cmd', type=str, help="Command to execute.")
 group.add_argument('--strace', metavar="file", nargs='+', help="Read output of strace.")
-parser_watch.add_argument('--follow', action='store_true')
-parser_watch.add_argument('--end', action='store_true')
-parser_watch.set_defaults(func=subcommand_watch)
+parser_detect.add_argument('--follow', action='store_true')
+parser_detect.add_argument('--end', action='store_true')
+parser_detect.set_defaults(func=subcommand_detect)
 
-# https://stackoverflow.com/q/48648036
-args = parser.parse_args()
-try:
-	args.func(args)
-except AttributeError:
-	parser.print_help()
-	parser.exit()
 
+def main():
+	# https://stackoverflow.com/q/48648036
+	args = parser.parse_args()
+	try:
+		args.func(args)
+	except AttributeError:
+		parser.print_help()
+		parser.exit()
+
+if __name__ == "__main__":
+	main()
